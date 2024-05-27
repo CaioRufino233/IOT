@@ -1,0 +1,120 @@
+//incluindo as bibliotecas LCD library e micro servo
+#include<LiquidCrystal.h>
+#include<Servo.h>
+
+//declaração de variaveis e pins onde se encontram
+LiquidCrystal lcd(6,7,8,9,10,11);
+int servoPin = 4;
+Servo ServoM;
+int h = 00; 
+int m = 00; 
+int s = 00; 
+
+void setup(){
+  
+  tone(5, 1000, 30);
+  
+  //configurando o micro servo
+  ServoM.attach(servoPin);
+  pinMode(servoPin, OUTPUT);
+  ServoM.write(0);
+  
+  //Inicializando o LCD
+  lcd.begin(16,2);//iniciando o painel LCD
+  lcd.setCursor(0,0);//seleciona a primeira linha do LCD
+  lcd.print("   Alimentador   ");
+  lcd.setCursor(0,1);//seleciona a segunda linha do LCD
+  lcd.print("   de Animais  ");
+  delay(2000);
+  lcd.clear();//limpa a mensagem
+ 
+  lcd.clear();//limpa a mensagem
+  lcd.setCursor(0,1);
+  lcd.print("  Iniciando...  ");
+  delay(2000);
+  lcd.clear();
+  
+  tone(5, 2000, 50);
+}
+
+void loop(){  
+  //Configurando a contagem regressiva para alimentação 
+  lcd.setCursor(0,0);
+  lcd.print("HORA DE COMER");
+  lcd.setCursor(0,1);
+  lcd.print("EM: ");
+  lcd.setCursor(6,1);
+  lcd.print(":");
+  lcd.setCursor(9,1);
+  lcd.print(":");
+  
+  s--;//decremento dos segundos
+  delay(1000);
+
+  if(s<0){
+    m--;
+    s=59;
+  }
+  if(m<0){
+    h--;
+    m=59;
+  }
+  if(h<0){
+    h=00; //Altere aqui o intervalo entre as refeições
+    m=00;
+    s=10;
+  }
+  if(m>9){
+    lcd.setCursor(7,1);
+    lcd.print(m);
+  }
+  else{
+    lcd.setCursor(7,1);
+    lcd.print("0"); 
+    lcd.setCursor(8,1);
+    lcd.print(m);
+    lcd.setCursor(9,1);
+    lcd.print(":");
+  }
+
+  if(s>9){
+    lcd.setCursor(10,1);
+    lcd.print(s);
+  }
+  else{
+    lcd.setCursor(10,1);
+    lcd.print("0"); 
+    lcd.setCursor(11,1);
+    lcd.print(s);
+    lcd.setCursor(12,1);
+    lcd.print(" ");
+  }
+
+  if(h>9){
+    lcd.setCursor(4,1);
+    lcd.print(h);
+  }
+  else{
+    lcd.setCursor(4,1);
+    lcd.print("0"); 
+    lcd.setCursor(5,1);
+    lcd.print(h);
+    lcd.setCursor(6,1);
+    lcd.print(":");
+  }
+  
+  //se todas as variaveis forem 0
+  
+  if ((h==0)&&(m==0)&&(s==0)){
+    tone(5, 3000, 3000);
+    lcd.setCursor(0,0);
+    lcd.print("HORA DE COMER!");
+    ServoM.write(0);//deixar o servo habilitado para liberar a comida
+    delay(3000); 
+    ServoM.write(180);
+    delay(1000);
+    ServoM.write(0);
+    lcd.clear();
+ }
+ 
+}
