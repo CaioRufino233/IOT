@@ -1,0 +1,56 @@
+import time
+import RPi.GPIO as GPIO
+
+# Configurando pinos
+servoPin = 4
+
+# Inicializando o servo
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servoPin, GPIO.OUT)
+ServoM = GPIO.PWM(servoPin, 50)  # PWM a 50Hz
+ServoM.start(0)
+
+# Função para configurar o servo
+def set_angle(angle):
+    duty = angle / 18 + 2
+    GPIO.output(servoPin, True)
+    ServoM.ChangeDutyCycle(duty)
+    time.sleep(1)
+    GPIO.output(servoPin, False)
+    ServoM.ChangeDutyCycle(0)
+
+# Loop principal
+try:
+    h = 0
+    m = 0
+    s = 0
+    while True:
+        # Configurando contagem regressiva para alimentação
+        print("HORA DE COMER")
+        print("EM: {:02d}:{:02d}:{:02d}".format(h, m, s))
+
+        s -= 1  # Decrementando segundos
+        time.sleep(1)
+
+        if s < 0:
+            m -= 1
+            s = 59
+        if m < 0:
+            h -= 1
+            m = 59
+        if h < 0:
+            h = 0  # Altere aqui o intervalo entre as refeições
+            m = 0
+            s = 10
+
+        # Se todas as variáveis forem 0
+        if h == 0 and m == 0 and s == 0:
+            print("HORA DE COMER!")
+            set_angle(180)  # Deixa o servo habilitado para liberar a comida
+            time.sleep(3)
+            set_angle(0)
+            time.sleep(1)
+
+# Lidando com a interrupção do teclado para sair do loop
+except KeyboardInterrupt:
+    GPIO.cleanup()
